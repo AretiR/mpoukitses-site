@@ -1,0 +1,435 @@
+!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Μπουκίτσες App — Παιδικές Συνταγές</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#FF7A59">
+  <style>
+    :root {
+      --primary: #FF7A59;
+      --primary-dark: #E86240;
+      --secondary: #2EC4B6;
+      --bg: #FFFDF9;
+      --card: #FFFFFF;
+      --text: #2B2D42;
+      --muted: #6C757D;
+      --border: #EFECE6;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background: var(--bg); color: var(--text); padding-bottom: 85px; }
+
+    /* Top Bar */
+    .topbar { position: sticky; top: 0; z-index: 20; background: rgba(255, 253, 249, 0.95); backdrop-filter: blur(8px); padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+    .brand { font-size: 1.25rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 6px; text-decoration: none; }
+    .pro-btn { background: linear-gradient(135deg, #FFB703, #FB8500); color: #fff; border: none; padding: 7px 14px; border-radius: 50px; font-weight: 700; font-size: 0.8rem; cursor: pointer; box-shadow: 0 3px 10px rgba(251, 133, 0, 0.25); }
+
+    .container { max-width: 600px; margin: 0 auto; padding: 16px; }
+
+    /* Search & Fridge Chips */
+    .section-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 10px; color: var(--text); display: flex; justify-content: space-between; align-items: center; }
+    .clear-btn { font-size: 0.8rem; color: var(--primary-dark); background: none; border: none; font-weight: 600; cursor: pointer; }
+    .chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
+    .chips::-webkit-scrollbar { display: none; }
+    .chip { background: #fff; border: 1.5px solid var(--border); padding: 8px 14px; border-radius: 50px; font-size: 0.85rem; font-weight: 600; white-space: nowrap; cursor: pointer; transition: 0.15s; color: var(--text); }
+    .chip.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .chip.age-active { background: var(--secondary); color: #fff; border-color: var(--secondary); }
+
+    /* Recipe Cards */
+    .recipe-list { display: flex; flex-direction: column; gap: 14px; margin-top: 12px; }
+    .recipe-card { background: var(--card); border-radius: 18px; padding: 16px; border: 1px solid var(--border); box-shadow: 0 4px 14px rgba(0,0,0,0.03); display: flex; gap: 14px; align-items: center; cursor: pointer; transition: transform 0.1s; }
+    .recipe-card:active { transform: scale(0.98); }
+    .recipe-emoji { width: 64px; height: 64px; border-radius: 14px; background: #FFF2EE; display: flex; align-items: center; justify-content: center; font-size: 2rem; flex-shrink: 0; }
+    .recipe-info { flex: 1; }
+    .recipe-tags { display: flex; gap: 6px; margin-bottom: 4px; flex-wrap: wrap; }
+    .tag { font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 6px; background: #F1F8F7; color: #1F8A7E; }
+    .tag.pro { background: #FFF4D6; color: #C96A00; }
+    .recipe-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 4px; }
+    .recipe-meta { font-size: 0.82rem; color: var(--muted); }
+
+    /* Shopping List */
+    .shop-card { background: var(--card); border-radius: 18px; padding: 18px; border: 1px solid var(--border); }
+    .shop-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .shop-item:last-child { border-bottom: none; }
+    .shop-left { display: flex; align-items: center; gap: 10px; cursor: pointer; flex: 1; }
+    .shop-left.done span { text-decoration: line-through; color: var(--muted); }
+    .del-item { background: none; border: none; color: #D9534F; font-size: 1.1rem; padding: 4px 8px; cursor: pointer; }
+    .empty-state { text-align: center; padding: 40px 20px; color: var(--muted); }
+
+    /* Bottom Navigation */
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 10px 0 18px; z-index: 20; }
+    .nav-item { background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 0.75rem; font-weight: 600; color: var(--muted); cursor: pointer; position: relative; }
+    .nav-item.active { color: var(--primary); }
+    .nav-icon { font-size: 1.35rem; }
+    .badge-count { position: absolute; top: -4px; right: -8px; background: var(--primary); color: #fff; font-size: 0.68rem; font-weight: 800; padding: 2px 6px; border-radius: 50px; }
+
+    /* Modal */
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 50; display: none; align-items: flex-end; justify-content: center; }
+    .modal-backdrop.open { display: flex; }
+    .modal { background: #fff; width: 100%; max-width: 600px; max-height: 88vh; border-radius: 24px 24px 0 0; padding: 24px 20px 34px; overflow-y: auto; animation: slideUp 0.2s ease-out; }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+    .close-modal { background: #F2F2F2; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 1.1rem; font-weight: 700; cursor: pointer; }
+    .ing-list { list-style: none; margin: 12px 0 20px; }
+    .ing-list li { padding: 8px 12px; background: #FFFDF9; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 6px; font-size: 0.92rem; }
+    .steps-list { padding-left: 20px; margin: 12px 0 24px; }
+    .steps-list li { margin-bottom: 10px; font-size: 0.95rem; line-height: 1.5; }
+    .action-btn { width: 100%; background: var(--primary); color: #fff; border: none; padding: 15px; border-radius: 14px; font-size: 1rem; font-weight: 700; cursor: pointer; }
+    .action-btn.added { background: var(--secondary); }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <a href="/" class="brand">🥕 Μπουκίτσες</a>
+    <button class="pro-btn" onclick="openProModal()">★ PRO Πλάνο</button>
+  </div>
+
+  <!-- TAB 1: RECIPES -->
+  <div id="tab-recipes" class="container">
+    <div class="section-title">
+      <span>🧊 Τι έχεις στο ψυγείο;</span>
+      <button id="clear-filters" class="clear-btn hidden" onclick="resetFilters()">Καθαρισμός</button>
+    </div>
+    <div class="chips" id="ingredient-chips"></div>
+
+    <div class="section-title" style="margin-top: 8px;">
+      <span>👶 Ηλικία & Κατηγορία</span>
+    </div>
+    <div class="chips" id="age-chips"></div>
+
+    <div class="recipe-list" id="recipe-list"></div>
+  </div>
+
+  <!-- TAB 2: SHOPPING LIST -->
+  <div id="tab-shop" class="container hidden">
+    <div class="section-title">
+      <span>🛒 Λίστα Supermarket</span>
+      <button class="clear-btn" onclick="clearShoppingList()">Διαγραφή Όλων</button>
+    </div>
+    <div id="shop-container"></div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <button class="nav-item active" id="nav-recipes" onclick="switchTab('recipes')">
+      <span class="nav-icon">🍲</span>
+      <span>Συνταγές</span>
+    </button>
+    <button class="nav-item" id="nav-shop" onclick="switchTab('shop')">
+      <span class="nav-icon">🛒</span>
+      <span>Λίστα Αγορών</span>
+      <span class="badge-count hidden" id="shop-badge">0</span>
+    </button>
+  </div>
+
+  <!-- RECIPE / PRO MODAL -->
+  <div class="modal-backdrop" id="modal-backdrop" onclick="closeModalOnBackdrop(event)">
+    <div class="modal" id="modal-content"></div>
+  </div>
+
+  <script>
+    const recipes = [
+      {
+        id: 1,
+        emoji: "🥞",
+        title: "Pancakes Μπανάνας με Βρώμη (Χωρίς Ζάχαρη)",
+        time: "10 λεπτά",
+        age: "1+ έτους",
+        category: "Πρωινό",
+        isPro: false,
+        tags: ["Μπανάνα", "Αβγό", "Βρώμη"],
+        ingredients: ["1 ώριμη μπανάνα", "1 αβγό", "4 κ.σ. νιφάδες βρώμης (αλεσμένες)", "1 πρέζα κανέλα", "Λίγο ελαιόλαδο ή βούτυρο για το τηγάνι"],
+        steps: [
+          "Λιώνουμε καλά την μπανάνα με ένα πιρούνι σε ένα μπολ.",
+          "Προσθέτουμε το αβγό, την αλεσμένη βρώμη και την κανέλα και ανακατεύουμε μέχρι να γίνει ομοιογενές μείγμα.",
+          "Ψήνουμε μικρά pancakes σε αντικολλητικό τηγάνι σε μέτρια φωτιά για 1-2 λεπτά από κάθε πλευρά."
+        ]
+      },
+      {
+        id: 2,
+        emoji: "🍗",
+        title: "Μπουκίτσες Κοτόπουλου Φούρνου με Κολοκυθάκι",
+        time: "20 λεπτά",
+        age: "1+ έτους",
+        category: "Μεσημεριανό",
+        isPro: false,
+        tags: ["Κοτόπουλο", "Κολοκυθάκι", "Αβγό"],
+        ingredients: ["300γρ. κιμάς κοτόπουλο", "1 μικρό κολοκυθάκι τριμμένο (καλά στραγγισμένο)", "1 αβγό", "2 κ.σ. φρυγανιά ολικής", "1 κ.σ. ελαιόλαδο", "Ρίγανη"],
+        steps: [
+          "Προθερμαίνουμε τον φούρνο στους 190°C στον αέρα.",
+          "Ανακατεύουμε όλα τα υλικά σε ένα μπολ και πλάθουμε μικρές μπουκίτσες.",
+          "Τις τοποθετούμε σε ταψί με αντικολλητικό χαρτί και ψήνουμε για 18-20 λεπτά μέχρι να ροδίσουν."
+        ]
+      },
+      {
+        id: 3,
+        emoji: "🍝",
+        title: "Κρεμώδη Ζυμαρικά με Κόκκινη Φακή & Ντομάτα",
+        time: "15 λεπτά",
+        age: "1+ έτους",
+        category: "Μεσημεριανό",
+        isPro: false,
+        tags: ["Ζυμαρικά", "Ντομάτα", "Καρότο"],
+        ingredients: ["200γρ. παιδικά ζυμαρικά (π.χ. βίδες)", "1/2 φλιτζάνι κόκκινες φακές (ξεπλυμένες)", "1 ώριμη ντομάτα τριμμένη", "1 καρότο τριμμένο", "2 κ.σ. ελαιόλαδο", "Τριμμένο τυρί για το σερβίρισμα"],
+        steps: [
+          "Βράζουμε τις κόκκινες φακές με το καρότο και την ντομάτα σε λίγο νερό για 12 λεπτά μέχρι να χυλώσουν.",
+          "Παράλληλα βράζουμε τα ζυμαρικά σύμφωνα με τις οδηγίες.",
+          "Πολτοποιούμε τη σάλτσα με ραβδομπλέντερ, προσθέτουμε ωμό ελαιόλαδο και ανακατεύουμε με τα ζυμαρικά."
+        ]
+      },
+      {
+        id: 4,
+        emoji: "🧁",
+        title: "Αλμυρά Muffins με Αβγό, Τυρί & Καρότο",
+        time: "20 λεπτά",
+        age: "3+ ετών",
+        category: "Ταπεράκι",
+        isPro: false,
+        tags: ["Αβγό", "Τυρί", "Καρότο"],
+        ingredients: ["3 αβγά", "100γρ. τριμμένο κασέρι ή γραβιέρα", "1 καρότο ψιλοτριμμένο", "1/2 φλιτζάνι γιαούρτι στραγγιστό", "1/2 φλιτζάνι αλεύρι που φουσκώνει μόνο του"],
+        steps: [
+          "Χτυπάμε τα αβγά με το γιαούρτι σε ένα μπολ.",
+          "Προσθέτουμε το τυρί, το καρότο και το αλεύρι ανακατεύοντας απαλά.",
+          "Μοιράζουμε σε θήκες σιλικόνης για muffins και ψήνουμε στους 180°C για 18-20 λεπτά."
+        ]
+      },
+      {
+        id: 5,
+        emoji: "🥑",
+        title: "Εβδομαδιαίο Πλάνο Παιδοδιατροφολόγου + 30 Συνταγές",
+        time: "PRO",
+        age: "Όλες οι ηλικίες",
+        category: "PRO",
+        isPro: true,
+        tags: ["Αβοκάντο", "Κοτόπουλο", "Μπανάνα"],
+        ingredients: [],
+        steps: []
+      }
+    ];
+
+    const availableIngredients = ["Μπανάνα", "Αβγό", "Κοτόπουλο", "Καρότο", "Τυρί", "Ζυμαρικά", "Ντομάτα", "Βρώμη", "Κολοκυθάκι"];
+    const ageFilters = ["Όλες", "1+ έτους", "3+ ετών", "Πρωινό", "Μεσημεριανό", "Ταπεράκι"];
+
+    let selectedIngredients = [];
+    let selectedAge = "Όλες";
+    let shoppingList = JSON.parse(localStorage.getItem("mpoukitses_shop") || "[]");
+
+    function init() {
+      renderChips();
+      renderRecipes();
+      updateShopBadge();
+    }
+
+    function renderChips() {
+      const ingEl = document.getElementById("ingredient-chips");
+      ingEl.innerHTML = availableIngredients.map(ing => `
+        <button class="chip ${selectedIngredients.includes(ing) ? 'active' : ''}" onclick="toggleIngredient('${ing}')">
+          ${selectedIngredients.includes(ing) ? '✓ ' : ''}${ing}
+        </button>
+      `).join("");
+
+      const ageEl = document.getElementById("age-chips");
+      ageEl.innerHTML = ageFilters.map(age => `
+        <button class="chip ${selectedAge === age ? 'age-active' : ''}" onclick="selectAge('${age}')">
+          ${age}
+        </button>
+      `).join("");
+
+      const clearBtn = document.getElementById("clear-filters");
+      if (selectedIngredients.length > 0 || selectedAge !== "Όλες") {
+        clearBtn.classList.remove("hidden");
+      } else {
+        clearBtn.classList.add("hidden");
+      }
+    }
+
+    function toggleIngredient(ing) {
+      if (selectedIngredients.includes(ing)) {
+        selectedIngredients = selectedIngredients.filter(i => i !== ing);
+      } else {
+        selectedIngredients.push(ing);
+      }
+      renderChips();
+      renderRecipes();
+    }
+
+    function selectAge(age) {
+      selectedAge = age;
+      renderChips();
+      renderRecipes();
+    }
+
+    function resetFilters() {
+      selectedIngredients = [];
+      selectedAge = "Όλες";
+      renderChips();
+      renderRecipes();
+    }
+
+    function renderRecipes() {
+      const listEl = document.getElementById("recipe-list");
+      const filtered = recipes.filter(r => {
+        const matchesIng = selectedIngredients.length === 0 || selectedIngredients.every(ing => r.tags.includes(ing));
+        const matchesAge = selectedAge === "Όλες" || r.age === selectedAge || r.category === selectedAge;
+        return matchesIng && matchesAge;
+      });
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = `<div class="empty-state">Δεν βρέθηκαν συνταγές με αυτόν τον συνδυασμό. Δοκίμασε να αφαιρέσεις ένα υλικό!</div>`;
+        return;
+      }
+
+      listEl.innerHTML = filtered.map(r => `
+        <div class="recipe-card" onclick="${r.isPro ? 'openProModal()' : `openRecipeModal(${r.id})`}">
+          <div class="recipe-emoji">${r.emoji}</div>
+          <div class="recipe-info">
+            <div class="recipe-tags">
+              ${r.isPro ? '<span class="tag pro">★ PRO ΠΑΚΕΤΟ</span>' : `<span class="tag">${r.age}</span><span class="tag">${r.category}</span>`}
+            </div>
+            <div class="recipe-title">${r.title}</div>
+            <div class="recipe-meta">⏱️ ${r.time} • ${r.tags.join(", ")}</div>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function openRecipeModal(id) {
+      const r = recipes.find(item => item.id === id);
+      const modal = document.getElementById("modal-content");
+      modal.innerHTML = `
+        <div class="modal-header">
+          <div>
+            <span class="tag">${r.age}</span> <span class="tag">⏱️ ${r.time}</span>
+            <h2 style="margin-top:8px; font-size:1.3rem;">${r.emoji} ${r.title}</h2>
+          </div>
+          <button class="close-modal" onclick="closeModal()">✕</button>
+        </div>
+        <h3 style="font-size:1rem;">Υλικά</h3>
+        <ul class="ing-list">
+          ${r.ingredients.map(i => `<li>• ${i}</li>`).join("")}
+        </ul>
+        <h3 style="font-size:1rem;">Εκτέλεση</h3>
+        <ol class="steps-list">
+          ${r.steps.map(s => `<li>${s}</li>`).join("")}
+        </ol>
+        <button id="add-shop-btn" class="action-btn" onclick="addIngredientsToShop(${r.id})">
+          🛒 Προσθήκη Υλικών στη Λίστα Supermarket
+        </button>
+      `;
+      document.getElementById("modal-backdrop").classList.add("open");
+    }
+
+    function openProModal() {
+      const modal = document.getElementById("modal-content");
+      modal.innerHTML = `
+        <div class="modal-header">
+          <div>
+            <span class="tag pro">★ ΜΠΟΥΚΙΤΣΕΣ PRO</span>
+            <h2 style="margin-top:8px; font-size:1.35rem;">Ξεκλείδωσε Όλες τις Συνταγές & Πλάνα</h2>
+          </div>
+          <button class="close-modal" onclick="closeModal()">✕</button>
+        </div>
+        <p style="color:var(--muted); margin-bottom:16px;">Οργάνωσε τη διατροφή του παιδιού σου χωρίς άγχος κάθε εβδομάδα:</p>
+        <ul class="ing-list">
+          <li>✅ <strong>150+ αποκλειστικές συνταγές</strong> για μωρά & νήπια</li>
+          <li>✅ <strong>Έτοιμα εβδομαδιαία μενού</strong> εγκεκριμένα από παιδοδιατροφολόγο</li>
+          <li>✅ <strong>Ιδέες για σχολικό ταπεράκι</strong> χωρίς ζάχαρη</li>
+          <li>✅ <strong>Χωρίς διαφημίσεις</strong></li>
+        </ul>
+        <div style="background:#FFF8EB; border:1.5px solid #FFB703; border-radius:14px; padding:14px; text-align:center; margin-bottom:16px;">
+          <div style="font-size:1.4rem; font-weight:800; color:#C96A00;">2,99€ / μήνα</div>
+          <div style="font-size:0.82rem; color:var(--muted);">7 ημέρες δωρεάν δοκιμή • Ακύρωση όποτε θέλεις</div>
+        </div>
+        <button class="action-btn" style="background:linear-gradient(135deg, #FFB703, #FB8500);" onclick="alert('Η πληρωμή θα συνδεθεί με Google Play / Apple Pay μόλις δημοσιευτεί η εφαρμογή!')">
+          Ξεκίνα Δωρεάν Δοκιμή 7 Ημερών
+        </button>
+      `;
+      document.getElementById("modal-backdrop").classList.add("open");
+    }
+
+    function closeModal() {
+      document.getElementById("modal-backdrop").classList.remove("open");
+    }
+
+    function closeModalOnBackdrop(e) {
+      if (e.target.id === "modal-backdrop") closeModal();
+    }
+
+    function addIngredientsToShop(id) {
+      const r = recipes.find(item => item.id === id);
+      r.ingredients.forEach(ing => {
+        if (!shoppingList.some(item => item.text === ing)) {
+          shoppingList.push({ text: ing, done: false });
+        }
+      });
+      saveShoppingList();
+      const btn = document.getElementById("add-shop-btn");
+      btn.textContent = "✓ Προστέθηκαν στη Λίστα!";
+      btn.classList.add("added");
+    }
+
+    function saveShoppingList() {
+      localStorage.setItem("mpoukitses_shop", JSON.stringify(shoppingList));
+      updateShopBadge();
+      renderShoppingList();
+    }
+
+    function updateShopBadge() {
+      const badge = document.getElementById("shop-badge");
+      const remaining = shoppingList.filter(i => !i.done).length;
+      if (remaining > 0) {
+        badge.textContent = remaining;
+        badge.classList.remove("hidden");
+      } else {
+        badge.classList.add("hidden");
+      }
+    }
+
+    function renderShoppingList() {
+      const container = document.getElementById("shop-container");
+      if (shoppingList.length === 0) {
+        container.innerHTML = `<div class="empty-state">Η λίστα σου είναι άδεια.<br>Άνοιξε μια συνταγή και πάτα «Προσθήκη Υλικών»!</div>`;
+        return;
+      }
+      container.innerHTML = `<div class="shop-card">` + shoppingList.map((item, idx) => `
+        <div class="shop-item">
+          <div class="shop-left ${item.done ? 'done' : ''}" onclick="toggleShopItem(${idx})">
+            <span>${item.done ? '☑️' : '⬜'}</span>
+            <span>${item.text}</span>
+          </div>
+          <button class="del-item" onclick="deleteShopItem(${idx})">✕</button>
+        </div>
+      `).join("") + `</div>`;
+    }
+
+    function toggleShopItem(idx) {
+      shoppingList[idx].done = !shoppingList[idx].done;
+      saveShoppingList();
+    }
+
+    function deleteShopItem(idx) {
+      shoppingList.splice(idx, 1);
+      saveShoppingList();
+    }
+
+    function clearShoppingList() {
+      shoppingList = [];
+      saveShoppingList();
+    }
+
+    function switchTab(tab) {
+      document.getElementById("tab-recipes").classList.toggle("hidden", tab !== "recipes");
+      document.getElementById("tab-shop").classList.toggle("hidden", tab !== "shop");
+      document.getElementById("nav-recipes").classList.toggle("active", tab === "recipes");
+      document.getElementById("nav-shop").classList.toggle("active", tab === "shop");
+      if (tab === "shop") renderShoppingList();
+    }
+
+    init();
+  </script>
+</body>
+</html>
