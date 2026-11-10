@@ -1,0 +1,108 @@
+
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Μπουκίτσες (Mpoukitses) — Γρήγορες & Θρεπτικές Παιδικές Συνταγές</title>
+  <meta name="description" content="Γρήγορες, θρεπτικές συνταγές χωρίς ζάχαρη για παιδιά, έξυπνη αναζήτηση με υλικά ψυγείου και αυτόματη λίστα supermarket.">
+  <style>
+    :root {
+      --primary: #FF7A59;
+      --primary-dark: #E86240;
+      --secondary: #2EC4B6;
+      --bg: #FFFDF9;
+      --text: #2B2D42;
+      --muted: #6C757D;
+      --card: #FFFFFF;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: var(--bg); color: var(--text); line-height: 1.6; }
+    .container { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+    
+    header { padding: 24px 0; display: flex; justify-content: space-between; align-items: center; }
+    .logo { font-size: 1.5rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 8px; text-decoration: none; }
+    .nav-btn { background: var(--primary); color: #fff; padding: 10px 20px; border-radius: 50px; text-decoration: none; font-weight: 600; font-size: 0.95rem; transition: 0.2s; }
+    .nav-btn:hover { background: var(--primary-dark); }
+
+    .hero { text-align: center; padding: 60px 0 40px; }
+    .badge { display: inline-block; background: #FFE8E1; color: var(--primary-dark); padding: 6px 14px; border-radius: 50px; font-size: 0.85rem; font-weight: 700; margin-bottom: 16px; }
+    h1 { font-size: 2.5rem; line-height: 1.2; margin-bottom: 16px; color: var(--text); }
+    .hero p { font-size: 1.15rem; color: var(--muted); max-width: 620px; margin: 0 auto 32px; }
+    .cta-group { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary { background: var(--primary); color: #fff; padding: 16px 32px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 1.05rem; box-shadow: 0 8px 20px rgba(255, 122, 89, 0.3); }
+    .btn-secondary { background: #fff; color: var(--text); border: 2px solid #EAEAEA; padding: 14px 28px; border-radius: 50px; text-decoration: none; font-weight: 600; font-size: 1rem; }
+
+    .features { padding: 50px 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; }
+    .card { background: var(--card); padding: 28px; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); border: 1px solid #F2EFE9; }
+    .icon { font-size: 2rem; margin-bottom: 12px; }
+    .card h3 { font-size: 1.2rem; margin-bottom: 8px; }
+    .card p { color: var(--muted); font-size: 0.95rem; }
+
+    .stores { text-align: center; background: #F4FBF9; padding: 48px 24px; border-radius: 24px; margin: 30px 0 60px; border: 1px solid #D9F2EC; }
+    .stores h2 { font-size: 1.75rem; margin-bottom: 10px; }
+    .stores p { color: var(--muted); margin-bottom: 24px; }
+    .store-badges { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .store-pill { background: var(--text); color: #fff; padding: 12px 24px; border-radius: 12px; font-weight: 600; font-size: 0.9rem; opacity: 0.85; }
+
+    footer { border-top: 1px solid #EAEAEA; padding: 30px 0; text-align: center; color: var(--muted); font-size: 0.9rem; }
+    footer a { color: var(--primary-dark); text-decoration: none; margin: 0 10px; }
+    @media (max-width: 600px) { h1 { font-size: 2rem; } }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <a href="/" class="logo">🥕 Μπουκίτσες</a>
+      <a href="/app.html" class="nav-btn">Δοκίμασε την Εφαρμογή</a>
+    </header>
+
+    <section class="hero">
+      <span class="badge">Για γονείς που δεν έχουν χρόνο για χάσιμο</span>
+      <h1>Γρήγορες & θρεπτικές συνταγές που τα παιδιά λατρεύουν.</h1>
+      <p>Βρες ιδέες 15 λεπτών χωρίς ζάχαρη, ψάξε με όσα υλικά έχεις ήδη στο ψυγείο και φτιάξε αυτόματα τη λίστα του supermarket.</p>
+      <div class="cta-group">
+        <a href="/app.html" class="btn-primary">Άνοιξε την Web Εφαρμογή &rarr;</a>
+        <a href="#features" class="btn-secondary">Πώς λειτουργεί</a>
+      </div>
+    </section>
+
+    <section id="features" class="features">
+      <div class="card">
+        <div class="icon">🧊</div>
+        <h3>Τι έχω στο ψυγείο;</h3>
+        <p>Επίλεξε 2-3 υλικά που έχεις στο σπίτι και δες αμέσως συνταγές που φτιάχνονται τώρα, χωρίς έξτρα ψώνια.</p>
+      </div>
+      <div class="card">
+        <div class="icon">⏱️</div>
+        <h3>Έτοιμα σε 15 λεπτά</h3>
+        <p>Ιδέες για πρωινό, μεσημεριανό και σχολικό ταπεράκι, προσαρμοσμένες στην ηλικία του παιδιού σου.</p>
+      </div>
+      <div class="card">
+        <div class="icon">🛒</div>
+        <h3>Έξυπνη Λίστα Αγορών</h3>
+        <p>Με ένα πάτημα, όλα τα υλικά της συνταγής μπαίνουν στη λίστα supermarket για να μην ξεχνάς τίποτα.</p>
+      </div>
+    </section>
+
+    <section class="stores">
+      <h2>Σύντομα σε iOS & Android</h2>
+      <p>Χρησιμοποίησε την εφαρμογή δωρεάν από τον browser του κινητού σου ή κατέβασέ την σύντομα από τα επίσημα καταστήματα.</p>
+      <div class="store-badges">
+        <span class="store-pill">📱 Google Play (Σύντομα)</span>
+        <span class="store-pill">🍎 Apple App Store (Σύντομα)</span>
+      </div>
+    </section>
+
+    <footer>
+      <p>&copy; 2026 Μπουκίτσες (Mpoukitses.com). Με επιφύλαξη παντός δικαιώματος.</p>
+      <p style="margin-top: 8px;">
+        <a href="/privacy.html">Πολιτική Απορρήτου (Privacy Policy)</a> |
+        <a href="mailto:support@mpoukitses.com">Επικοινωνία</a>
+      </p>
+    </footer>
+  </div>
+
+</body>
+</html>
